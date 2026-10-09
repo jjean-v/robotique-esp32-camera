@@ -170,27 +170,28 @@ void app_main(void)
     maybe_init_autofocus();
 #endif
 
-    while (1)
-    {
+    while (1) {
         ESP_LOGI(TAG, "Taking picture...");
         camera_fb_t *pic = esp_camera_fb_get();
 
-        static int n = 0;
-        char nom[32];
-        snprintf(nom, sizeof(nom), "/sdcard/img%03d.jpg", n++);
-        FILE *f = fopen(nom, "wb");
-        if (f) {
-            fwrite(pic->buf, 1, pic->len, f);
-            fclose(f);
-            ESP_LOGI(TAG, "Photo enregistree : %s", nom);
+        if (pic) {
+            static int n = 0;
+            char nom[32];
+            snprintf(nom, sizeof(nom), "/sdcard/img%03d.jpg", n++);
+            FILE *f = fopen(nom, "wb");
+            if (f) {
+                fwrite(pic->buf, 1, pic->len, f);
+                fclose(f);
+                ESP_LOGI(TAG, "Photo enregistree : %s (%zu octets)", nom, pic->len);
+            } else {
+                ESP_LOGE(TAG, "Impossible d'ouvrir %s", nom);
+            }
+            esp_camera_fb_return(pic);
         }
 
-        // use pic->buf to access the image
-        ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
-        esp_camera_fb_return(pic);
-
-        vTaskDelay(5000 / portTICK_RATE_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
+
 #else
     ESP_LOGE(TAG, "Camera support is not available for this chip");
     return;
