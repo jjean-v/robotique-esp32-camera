@@ -1,0 +1,23 @@
+Command: cmake -G Ninja -B /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/build -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/ubuntu-jean/.espressif/tools/python/v6.1/venv/bin/python -DESP_PLATFORM=1 -DIDF_TARGET=esp32 -DCCACHE_ENABLE=False /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example
+CMake Deprecation Warning at CMakeLists.txt:3 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+Loading defaults file /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/sdkconfig.defaults...
+NOTE: /tmp/kconfgen_tmpkxof2n5g:1: CONFIG_ESP32_DEFAULT_CPU_FREQ_240 was replaced with CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240
+NOTE: /tmp/kconfgen_tmpkxof2n5g:13: CONFIG_SPIRAM_SUPPORT was replaced with CONFIG_SPIRAM
+NOTE: /tmp/kconfgen_tmpkxof2n5g:14: CONFIG_ESP32_SPIRAM_SUPPORT was replaced with CONFIG_SPIRAM
+NOTE: unknown kconfig symbol 'ESP32S2_DEFAULT_CPU_FREQ_240' assigned to 'y' in /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/sdkconfig.defaults
+NOTE: unknown kconfig symbol 'ESP32S3_DEFAULT_CPU_FREQ_240' assigned to 'y' in /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/sdkconfig.defaults
+NOTE: unknown kconfig symbol 'ESP32S2_SPIRAM_SUPPORT' assigned to 'y' in /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/sdkconfig.defaults
+NOTE: unknown kconfig symbol 'ESP32S3_SPIRAM_SUPPORT' assigned to 'y' in /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/sdkconfig.defaults
+NOTE: Kconfig parser version: 1
+NOTE: Kconfig defaults policy: use sdkconfig
+NOTE: Status: Finished with notifications
+NOTE: /home/ubuntu-jean/.espressif/v6.1/esp-idf/components/esp_psram/./esp32/Kconfig.spiram:1: SPIRAM assigned multiple times: y (user-set), y (user-set), y (user-set) -> using y
+HINT: Under normal circumstances, there should be only one (or none) assignment per config option. Multiple assignments mean somebody manually altered the sdkconfig file. If you edited the sdkconfig file intentionally, this area can be ignored.

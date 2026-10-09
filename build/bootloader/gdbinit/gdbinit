@@ -1,0 +1,2 @@
+source /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/build/bootloader/gdbinit/symbols
+source /home/ubuntu-jean/Documents/Projet/robotique-utc/esp/camera_example/build/bootloader/gdbinit/connect
