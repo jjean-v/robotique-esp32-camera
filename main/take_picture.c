@@ -34,6 +34,9 @@
 // ================================ CODE ======================================
 
 #include "sdkconfig.h"
+#include "esp_vfs_fat.h"
+#include "sdmmc_cmd.h"
+#include "driver/sdmmc_host.h"
 
 #include <esp_log.h>
 #include <esp_system.h>
@@ -86,7 +89,7 @@ static camera_config_t camera_config = {
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
-    .pixel_format = PIXFORMAT_RGB565, //YUV422,GRAYSCALE,RGB565,JPEG
+    .pixel_format = PIXFORMAT_JPEG, //YUV422,GRAYSCALE,RGB565,JPEG
     .frame_size = FRAMESIZE_QVGA,    //QQVGA-UXGA, For ESP32, do not use sizes above QVGA when not JPEG. The performance of the ESP32-S series has improved a lot, but JPEG mode always gives better frame rates.
 
     .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
@@ -139,12 +142,27 @@ static void maybe_init_autofocus(void)
 #endif
 #endif
 
+static void monter_sd(void)
+{
+    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = false,
+        .max_files = 5,
+        .allocation_unit_size = 16 * 1024
+    };
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+    sdmmc_slot_config_t slot = SDMMC_SLOT_CONFIG_DEFAULT();
+    slot.width = 1;                       // mode 1 ligne
+    sdmmc_card_t *card;
+    ESP_ERROR_CHECK(esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot, &mount_config, &card));
+}
+
 void app_main(void)
 {
 #if ESP_CAMERA_SUPPORTED
     if(ESP_OK != init_camera()) {
         return;
     }
+    monter_sd();
 
 #if defined(CONFIG_CAMERA_AF_SUPPORT) && CONFIG_CAMERA_AF_SUPPORT
     // Initialize autofocus if configured and supported by the sensor.
@@ -157,6 +175,16 @@ void app_main(void)
         ESP_LOGI(TAG, "Taking picture...");
         camera_fb_t *pic = esp_camera_fb_get();
 
+        static int n = 0;
+        char nom[32];
+        snprintf(nom, sizeof(nom), "/sdcard/img%03d.jpg", n++);
+        FILE *f = fopen(nom, "wb");
+        if (f) {
+            fwrite(pic->buf, 1, pic->len, f);
+            fclose(f);
+            ESP_LOGI(TAG, "Photo enregistree : %s", nom);
+        }
+
         // use pic->buf to access the image
         ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
         esp_camera_fb_return(pic);
@@ -168,3 +196,4 @@ void app_main(void)
     return;
 #endif
 }
+

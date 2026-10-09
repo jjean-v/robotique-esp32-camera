@@ -877,6 +877,13 @@ CONFIG_I2C_MASTER_ISR_HANDLER_IN_IRAM=y
 # end of ESP-Driver:LEDC Configurations
 
 #
+# ESP-Driver:SD Host SDMMC Controller Configurations
+#
+# default:
+# CONFIG_SD_HOST_SDMMC_ISR_CACHE_SAFE is not set
+# end of ESP-Driver:SD Host SDMMC Controller Configurations
+
+#
 # ESP-Driver:SPI Configurations
 #
 # default:
@@ -886,6 +893,24 @@ CONFIG_SPI_MASTER_ISR_IN_IRAM=y
 # default:
 CONFIG_SPI_SLAVE_ISR_IN_IRAM=y
 # end of ESP-Driver:SPI Configurations
+
+#
+# ESP-Driver:UART Configurations
+#
+# default:
+# CONFIG_UART_ISR_IN_IRAM is not set
+# end of ESP-Driver:UART Configurations
+
+#
+# ESP-Driver:UHCI Configurations
+#
+# default:
+# CONFIG_UHCI_ISR_HANDLER_IN_IRAM is not set
+# default:
+# CONFIG_UHCI_ISR_CACHE_SAFE is not set
+# default:
+# CONFIG_UHCI_ENABLE_DEBUG_LOG is not set
+# end of ESP-Driver:UHCI Configurations
 
 #
 # Hardware Settings
@@ -1078,6 +1103,18 @@ CONFIG_LIBC_PICOLIBC_NEWLIB_COMPATIBILITY=y
 CONFIG_LIBC_MISC_IN_IRAM=y
 # default:
 CONFIG_LIBC_LOCKS_PLACE_IN_IRAM=y
+# default:
+CONFIG_LIBC_STDOUT_LINE_ENDING_CRLF=y
+# default:
+# CONFIG_LIBC_STDOUT_LINE_ENDING_LF is not set
+# default:
+# CONFIG_LIBC_STDOUT_LINE_ENDING_CR is not set
+# default:
+# CONFIG_LIBC_STDIN_LINE_ENDING_CRLF is not set
+# default:
+# CONFIG_LIBC_STDIN_LINE_ENDING_LF is not set
+# default:
+CONFIG_LIBC_STDIN_LINE_ENDING_CR=y
 # default:
 CONFIG_LIBC_TIME_SYSCALL_USE_RTC_HRT=y
 # default:
@@ -1288,6 +1325,8 @@ CONFIG_ESP_CONSOLE_UART_NUM=0
 CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=0
 # default:
 CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+# default:
+CONFIG_ESP_STDIO_MAX_VFS_ENTRIES=2
 # end of ESP-STDIO
 
 #
@@ -1423,6 +1462,112 @@ CONFIG_ESP_TIMER_ISR_AFFINITY_CPU0=y
 # default:
 CONFIG_ESP_TIMER_IMPL_TG0_LAC=y
 # end of ESP Timer (High Resolution Timer)
+
+#
+# FAT Filesystem support
+#
+# default:
+CONFIG_FATFS_VOLUME_COUNT=2
+# default:
+# CONFIG_FATFS_LFN_NONE is not set
+# default:
+CONFIG_FATFS_LFN_HEAP=y
+# default:
+# CONFIG_FATFS_LFN_STACK is not set
+# default:
+# CONFIG_FATFS_SECTOR_512 is not set
+# default:
+CONFIG_FATFS_SECTOR_4096=y
+# default:
+# CONFIG_FATFS_CODEPAGE_DYNAMIC is not set
+# default:
+CONFIG_FATFS_CODEPAGE_437=y
+# default:
+# CONFIG_FATFS_CODEPAGE_720 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_737 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_771 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_775 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_850 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_852 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_855 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_857 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_860 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_861 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_862 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_863 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_864 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_865 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_866 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_869 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_932 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_936 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_949 is not set
+# default:
+# CONFIG_FATFS_CODEPAGE_950 is not set
+# default:
+CONFIG_FATFS_CODEPAGE=437
+# default:
+CONFIG_FATFS_MAX_LFN=255
+# default:
+CONFIG_FATFS_API_ENCODING_ANSI_OEM=y
+# default:
+# CONFIG_FATFS_API_ENCODING_UTF_8 is not set
+# default:
+CONFIG_FATFS_FS_LOCK=0
+# default:
+CONFIG_FATFS_TIMEOUT_MS=10000
+# default:
+CONFIG_FATFS_PER_FILE_CACHE=y
+# default:
+CONFIG_FATFS_ALLOC_PREFER_EXTRAM=y
+# default:
+CONFIG_FATFS_ALLOC_PREFER_ALIGNED_WORK_BUFFERS=y
+# default:
+# CONFIG_FATFS_USE_FASTSEEK is not set
+# default:
+CONFIG_FATFS_USE_STRFUNC_NONE=y
+# default:
+# CONFIG_FATFS_USE_STRFUNC_WITHOUT_CRLF_CONV is not set
+# default:
+# CONFIG_FATFS_USE_STRFUNC_WITH_CRLF_CONV is not set
+# default:
+CONFIG_FATFS_VFS_FSTAT_BLKSIZE=0
+# default:
+# CONFIG_FATFS_IMMEDIATE_FSYNC is not set
+# default:
+# CONFIG_FATFS_USE_LABEL is not set
+# default:
+CONFIG_FATFS_LINK_LOCK=y
+# default:
+CONFIG_FATFS_USE_DYN_BUFFERS=y
+
+#
+# File system free space calculation behavior
+#
+# default:
+CONFIG_FATFS_DONT_TRUST_FREE_CLUSTER_CNT=0
+# default:
+CONFIG_FATFS_DONT_TRUST_LAST_ALLOC=0
+# end of File system free space calculation behavior
+# end of FAT Filesystem support
 
 #
 # FreeRTOS
@@ -1679,6 +1824,8 @@ CONFIG_MBEDTLS_VER_4_X_SUPPORT=y
 CONFIG_MBEDTLS_COMPILER_OPTIMIZATION_SIZE=y
 # default:
 # CONFIG_MBEDTLS_COMPILER_OPTIMIZATION_PERF is not set
+# default:
+CONFIG_MBEDTLS_FS_IO=y
 # default:
 # CONFIG_MBEDTLS_PSA_ITS_CUSTOM_STORAGE_BACKEND is not set
 # default:
@@ -2054,6 +2201,13 @@ CONFIG_PTHREAD_TASK_NAME_DEFAULT="pthread"
 # end of PThreads
 
 #
+# SD Protocol Layer Configuration
+#
+# default:
+CONFIG_SD_ENABLE_SDIO_SUPPORT=y
+# end of SD Protocol Layer Configuration
+
+#
 # MMU Config
 #
 # default:
@@ -2157,6 +2311,48 @@ CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP=y
 # default:
 CONFIG_SPI_FLASH_ENABLE_ENCRYPTED_READ_WRITE=y
 # end of SPI Flash driver
+
+#
+# Virtual file system
+#
+# default:
+CONFIG_VFS_SUPPORT_IO=y
+# default:
+CONFIG_VFS_SUPPORT_DIR=y
+# default:
+CONFIG_VFS_SUPPORT_SELECT=y
+# default:
+CONFIG_VFS_SUPPRESS_SELECT_DEBUG_OUTPUT=y
+# default:
+# CONFIG_VFS_SELECT_IN_RAM is not set
+# default:
+# CONFIG_VFS_SUPPORT_TERMIOS is not set
+# default:
+CONFIG_VFS_MAX_COUNT=8
+# default:
+# CONFIG_VFS_SUPPRESS_CTX_DEPRECATION is not set
+
+#
+# Host File System I/O (Semihosting)
+#
+# default:
+CONFIG_VFS_SEMIHOSTFS_MAX_MOUNT_POINTS=1
+# end of Host File System I/O (Semihosting)
+
+# default:
+CONFIG_VFS_INITIALIZE_DEV_NULL=y
+# end of Virtual file system
+
+#
+# Wear Levelling
+#
+# default:
+# CONFIG_WL_SECTOR_SIZE_512 is not set
+# default:
+CONFIG_WL_SECTOR_SIZE_4096=y
+# default:
+CONFIG_WL_SECTOR_SIZE=4096
+# end of Wear Levelling
 
 #
 # Camera configuration
@@ -2316,6 +2512,12 @@ CONFIG_ESP32_BROWNOUT_DET_LVL_SEL_0=y
 CONFIG_BROWNOUT_DET_LVL=0
 CONFIG_ESP32_BROWNOUT_DET_LVL=0
 CONFIG_ESP_SYSTEM_BROWNOUT_INTR=y
+CONFIG_NEWLIB_STDOUT_LINE_ENDING_CRLF=y
+# CONFIG_NEWLIB_STDOUT_LINE_ENDING_LF is not set
+# CONFIG_NEWLIB_STDOUT_LINE_ENDING_CR is not set
+# CONFIG_NEWLIB_STDIN_LINE_ENDING_CRLF is not set
+# CONFIG_NEWLIB_STDIN_LINE_ENDING_LF is not set
+CONFIG_NEWLIB_STDIN_LINE_ENDING_CR=y
 CONFIG_NEWLIB_TIME_SYSCALL_USE_RTC_HRT=y
 CONFIG_ESP32_TIME_SYSCALL_USE_RTC_HRT=y
 CONFIG_ESP32_TIME_SYSCALL_USE_RTC_FRC1=y
@@ -2380,4 +2582,7 @@ CONFIG_ESP32_PTHREAD_TASK_NAME_DEFAULT="pthread"
 CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_ABORTS=y
 # CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_FAILS is not set
 # CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_ALLOWED is not set
+CONFIG_SUPPRESS_SELECT_DEBUG_OUTPUT=y
+# CONFIG_SUPPORT_TERMIOS is not set
+CONFIG_SEMIHOSTFS_MAX_MOUNT_POINTS=1
 # End of deprecated options
