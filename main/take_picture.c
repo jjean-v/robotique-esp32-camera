@@ -103,6 +103,9 @@ static camera_config_t camera_config = {
     .jpeg_buffer_size = 0, //Set to a custom size in bytes for JPEG mode, or 0 to use the default size
 };
 
+static const int MES_IDS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 15, 16, 17, 18, 19, 20};
+
+
 static esp_err_t init_camera(void)
 {
     //initialize the camera
@@ -161,7 +164,6 @@ static void monter_sd(void)
 }
 
 
-static const int MES_IDS[] = {0, 1, 2};
  
 /* Enregistre l'image en PGM (lisible par GIMP, OpenCV, etc.), pratique pourµ */
 static void enregistrer_pgm(const char *nom, const camera_fb_t *pic)
