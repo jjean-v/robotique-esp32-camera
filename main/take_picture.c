@@ -47,6 +47,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "aruco.h"
+#include "esp_timer.h"
+#include "esp_heap_caps.h" 
+
 // support IDF 5.x
 #ifndef portTICK_RATE_MS
 #define portTICK_RATE_MS portTICK_PERIOD_MS
@@ -89,7 +93,7 @@ static camera_config_t camera_config = {
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
-    .pixel_format = PIXFORMAT_JPEG, //YUV422,GRAYSCALE,RGB565,JPEG
+    .pixel_format = PIXFORMAT_GRAYSCALE, //YUV422,GRAYSCALE,RGB565,JPEG
     .frame_size = FRAMESIZE_QVGA,    //QQVGA-UXGA, For ESP32, do not use sizes above QVGA when not JPEG. The performance of the ESP32-S series has improved a lot, but JPEG mode always gives better frame rates.
 
     .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
@@ -156,45 +160,113 @@ static void monter_sd(void)
     ESP_ERROR_CHECK(esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot, &mount_config, &card));
 }
 
+
+static const int MES_IDS[] = {0, 1, 2};
+ 
+/* Enregistre l'image en PGM (lisible par GIMP, OpenCV, etc.), pratique pourµ */
+static void enregistrer_pgm(const char *nom, const camera_fb_t *pic)
+{
+    FILE *f = fopen(nom, "wb");
+    if (!f) {
+        ESP_LOGE(TAG, "Impossible d'ouvrir %s", nom);
+        return;
+    }
+    fprintf(f, "P5\n%d %d\n255\n", (int)pic->width, (int)pic->height);
+    fwrite(pic->buf, 1, pic->len, f);
+    fclose(f);
+}
+
+/* Enregistre une image RGB en PPM (couleur). S'ouvre avec GIMP, la visionneuse
+ * d'images de GNOME, OpenCV... */
+static void enregistrer_ppm(const char *nom, const uint8_t *rgb, int w, int h)
+{
+    FILE *f = fopen(nom, "wb");
+    if (!f) {
+        ESP_LOGE(TAG, "Impossible d'ouvrir %s", nom);
+        return;
+    }
+    fprintf(f, "P6\n%d %d\n255\n", w, h);
+    fwrite(rgb, 1, (size_t)w * h * 3, f);
+    fclose(f);
+}
+
+ 
 void app_main(void)
 {
 #if ESP_CAMERA_SUPPORTED
-    if(ESP_OK != init_camera()) {
+    if (ESP_OK != init_camera()) {
         return;
     }
     monter_sd();
+ 
+    aruco_params_t params;
+    aruco_default_params(&params);
+    params.allowed_ids = MES_IDS;
+    params.n_allowed_ids = sizeof(MES_IDS) / sizeof(MES_IDS[0]);
+ 
+    aruco_marker_t markers[8];
+    aruco_stats_t stats;
+    int n_img = 0;
 
-#if defined(CONFIG_CAMERA_AF_SUPPORT) && CONFIG_CAMERA_AF_SUPPORT
-    // Initialize autofocus if configured and supported by the sensor.
-    // In menuconfig: Component config → Camera configuration → Enable autofocus support
-    maybe_init_autofocus();
-#endif
-
-    while (1) {
-        ESP_LOGI(TAG, "Taking picture...");
-        camera_fb_t *pic = esp_camera_fb_get();
-
-        if (pic) {
-            static int n = 0;
-            char nom[32];
-            snprintf(nom, sizeof(nom), "/sdcard/img%03d.jpg", n++);
-            FILE *f = fopen(nom, "wb");
-            if (f) {
-                fwrite(pic->buf, 1, pic->len, f);
-                fclose(f);
-                ESP_LOGI(TAG, "Photo enregistree : %s (%zu octets)", nom, pic->len);
-            } else {
-                ESP_LOGE(TAG, "Impossible d'ouvrir %s", nom);
-            }
-            esp_camera_fb_return(pic);
-        }
-
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
+    /* Buffer couleur pour l'image annotee (320x240x3 = 230 Ko -> PSRAM).
+     * Alloue une seule fois, pas a chaque image. */
+    uint8_t *rgb = heap_caps_malloc(320 * 240 * 3, MALLOC_CAP_SPIRAM);
+    if (!rgb) {
+        ESP_LOGE(TAG, "Pas assez de PSRAM pour l'image couleur");
+        return;
     }
+ 
+    while (1) {
+        camera_fb_t *pic = esp_camera_fb_get();
+        if (!pic) {
+            ESP_LOGE(TAG, "Capture echouee");
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            continue;
+        }
+        if (pic->format != PIXFORMAT_GRAYSCALE) {
+            ESP_LOGE(TAG, "La camera doit etre en PIXFORMAT_GRAYSCALE");
+            esp_camera_fb_return(pic);
+            return;
+        }
+ 
+        int64_t t0 = esp_timer_get_time();
+        int n = aruco_detect(pic->buf, pic->width, pic->height, &params,
+                             markers, 8, &stats);
+        int64_t t1 = esp_timer_get_time();
+ 
+        if (n < 0) {
+            ESP_LOGE(TAG, "aruco_detect : memoire insuffisante");
+        } else {
+            ESP_LOGI(TAG, "%d marqueur(s) en %lld ms (%d quads, %d rejetes)",
+                     n, (t1 - t0) / 1000, stats.n_quads, stats.n_rejected);
+            for (int i = 0; i < n; i++) {
+                ESP_LOGI(TAG, "  ID %d  centre (%.1f, %.1f)  coin0 (%.1f, %.1f)",
+                         markers[i].id, markers[i].center.x, markers[i].center.y,
+                         markers[i].corners[0].x, markers[i].corners[0].y);
+            }
+        }
+ 
+         /* Debug : une image sur 10 sur la carte SD, en double :
+         *   imgXXX.pgm : l'image brute (pour rejouer sur PC avec test_pgm)
+         *   detXXX.ppm : l'image avec les marqueurs encadres en bleu */
+        if (n_img % 10 == 0 && n >= 0) {
+            char nom[32];
+            snprintf(nom, sizeof(nom), "/sdcard/img%03d.pgm", n_img / 10);
+            enregistrer_pgm(nom, pic);
 
+            aruco_gray_to_rgb(pic->buf, pic->width, pic->height, rgb);
+            aruco_draw_markers(rgb, pic->width, pic->height, markers, n,
+                               0, 0, 255, 2);          /* bleu, 2 px d'epaisseur */
+            snprintf(nom, sizeof(nom), "/sdcard/det%03d.ppm", n_img / 10);
+            enregistrer_ppm(nom, rgb, pic->width, pic->height);
+        }
+        n_img++;
+ 
+        esp_camera_fb_return(pic);
+        vTaskDelay(10 / portTICK_PERIOD_MS); /* laisse respirer le watchdog */
+    }
 #else
     ESP_LOGE(TAG, "Camera support is not available for this chip");
-    return;
 #endif
 }
-
+ 
