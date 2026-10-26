@@ -165,7 +165,6 @@ static void monter_sd(void)
 
 
  
-/* Enregistre l'image en PGM (lisible par GIMP, OpenCV, etc.), pratique pourµ */
 static void enregistrer_pgm(const char *nom, const camera_fb_t *pic)
 {
     FILE *f = fopen(nom, "wb");
@@ -178,8 +177,7 @@ static void enregistrer_pgm(const char *nom, const camera_fb_t *pic)
     fclose(f);
 }
 
-/* Enregistre une image RGB en PPM (couleur). S'ouvre avec GIMP, la visionneuse
- * d'images de GNOME, OpenCV... */
+/* Enregistre une image RGB en PPM (couleur) */
 static void enregistrer_ppm(const char *nom, const uint8_t *rgb, int w, int h)
 {
     FILE *f = fopen(nom, "wb");
@@ -248,13 +246,11 @@ void app_main(void)
             }
         }
  
-         /* Debug : une image sur 10 sur la carte SD, en double :
-         *   imgXXX.pgm : l'image brute (pour rejouer sur PC avec test_pgm)
-         *   detXXX.ppm : l'image avec les marqueurs encadres en bleu */
+         /* Save one image out of 10 in the SD card*/
         if (n_img % 10 == 0 && n >= 0) {
             char nom[32];
-            snprintf(nom, sizeof(nom), "/sdcard/img%03d.pgm", n_img / 10);
-            enregistrer_pgm(nom, pic);
+            //snprintf(nom, sizeof(nom), "/sdcard/img%03d.pgm", n_img / 10);
+            //enregistrer_pgm(nom, pic);
 
             aruco_gray_to_rgb(pic->buf, pic->width, pic->height, rgb);
             aruco_draw_markers(rgb, pic->width, pic->height, markers, n,
@@ -265,7 +261,7 @@ void app_main(void)
         n_img++;
  
         esp_camera_fb_return(pic);
-        vTaskDelay(10 / portTICK_PERIOD_MS); /* laisse respirer le watchdog */
+        vTaskDelay(10 / portTICK_PERIOD_MS); /
     }
 #else
     ESP_LOGE(TAG, "Camera support is not available for this chip");
