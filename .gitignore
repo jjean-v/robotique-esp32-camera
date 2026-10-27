@@ -1,2 +1,6 @@
+# Generated files
 build/*
 managed_components/*
+
+# IDE files
+.vscode/*

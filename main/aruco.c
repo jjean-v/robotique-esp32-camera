@@ -2,7 +2,7 @@
  * aruco.c - Detecteur ArUco minimal en C pur (sans OpenCV). Voir aruco.h.
  */
 #include "aruco.h"
-#include "aruco_dict_6x6_250.h"
+#include "aruco_dict_4x4_250.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -26,7 +26,7 @@
 #define ARUCO_FREE(p)          free(p)
 #endif
 
-#define MARKER_BITS   6                 /* 6x6 cases de code          */
+#define MARKER_BITS   4                 /* 4x4 cases de code          */
 #define GRID          (MARKER_BITS + 2) /* + 1 case de bordure noire  */
 #define N_DIRS        16                /* directions pour les coins  */
 
@@ -586,7 +586,7 @@ static int decode_quad(const uint8_t *gray, int w, int h, const aruco_point_t q[
             }
         for (int id = 0; id < ARUCO_DICT_SIZE; id++) {
             if (!id_allowed(p, id)) continue;
-            int ham = popcount64(code ^ ARUCO_DICT_6X6_250[id]);
+            int ham = popcount64(code ^ ARUCO_DICT_4X4_250[id]);
             if (ham < best_ham) { best_ham = ham; best_id = id; best_rot = rot; }
         }
     }

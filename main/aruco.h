@@ -1,7 +1,7 @@
 /*
  * aruco.h - Detecteur ArUco minimal en C pur (sans OpenCV)
  *
- * Dictionnaire : DICT_6X6_250 (le meme que cv::aruco::DICT_6X6_250).
+ * Dictionnaire : DICT_4X4_250 (le meme que cv::aruco::DICT_4X4_250).
  * Entree       : une image en niveaux de gris, 1 octet par pixel (ex. PIXFORMAT_GRAYSCALE).
  * Sortie       : ID + 4 coins de chaque marqueur, dans le meme ordre qu'OpenCV
  *                (haut-gauche, haut-droit, bas-droit, bas-gauche du marqueur, sens horaire).
@@ -24,7 +24,7 @@ typedef struct {
 } aruco_point_t;
 
 typedef struct {
-    int id;                    /* ID dans DICT_6X6_250 (0..249)                       */
+    int id;                    /* ID dans DICT_4X4_250 (0..249)                       */
     aruco_point_t corners[4];  /* coins, meme ordre qu'OpenCV                         */
     aruco_point_t center;      /* centre du marqueur                                  */
     int hamming;               /* nb de bits corriges (0 = lecture parfaite)          */
